@@ -15,3 +15,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey<'a>{
         }
     }
 }
+
+// any data type that implements from request trait should pass the autentication first 
+// as in our above example ApiKey implementing from request is handeled by the guard 
+// before serving to sensitive route, if the key matches with the value the outcome succed
+// else it will be servered as a bad request.
