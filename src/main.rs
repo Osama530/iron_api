@@ -1,25 +1,27 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #[macro_use] extern crate rocket;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate rocket_contrib;
 
-#[macro_use]
-extern crate rocket_contrib;
+use dotenv::dotenv;
+use std::env;
 
+mod schema;
+mod model;
+mod db;
+mod routes;
 
-mod from_request;
+use routes::*;
 
-use from_request::*;
-
-#[get("/sensitive")]
-fn sensitive(key: ApiKey) -> &'static str {
-    "Sensitive data."
-}
-
-// Part 2:
 fn main()  {
+    dotenv().ok();
+    let db_url = env::var("DATABASE_URL").expect("ulr does not match");
+    let db_pool = db::pool_init(db_url);
+    
 
     rocket::ignite()
-        // .mount("/api", routes![])
-        .mount("/", routes![sensitive])
+        .manage(db_pool)
+        .mount("/api", routes![show_all, add_student, show_id, update_name, delete_id])
         .launch();
 }
 
